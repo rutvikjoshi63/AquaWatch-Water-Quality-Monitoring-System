@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - AquaWatch{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Water Quality Monitoring Dashboard</h1>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Active Water Bodies</h5>
+                <h2 class="card-text">{{ total_water_bodies }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Measurements</h5>
+                <h2 class="card-text">{{ total_measurements }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Recent (30 days)</h5>
+                <h2 class="card-text">{{ recent_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Active Alerts</h5>
+                <h2 class="card-text">{{ alert_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Map and Alerts Row -->
+<div class="row mb-4">
+    <!-- Map -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Monitoring Locations</h5>
+            </div>
+            <div class="card-body">
+                <div id="map" style="height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alerts -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">Recent Alerts</h5>
+            </div>
+            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                {% if measurements_with_alerts %}
+                    {% for measurement in measurements_with_alerts %}
+                    <div class="alert alert-danger mb-2">
+                        <strong>{{ measurement.water_body.name }}</strong><br>
+                        <small>{{ measurement.measured_at|date:"M d, Y H:i" }}</small>
+                        <ul class="mb-0 mt-1">
+                            {% for alert in measurement.get_alerts %}
+                            <li><small>{{ alert }}</small></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No active alerts. All measurements within EPA standards.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">pH Trends (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="phChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dissolved Oxygen Trends (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="doChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize Map
+const map = L.map('map').setView([37.0902, -95.7129], 4);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Add markers for water bodies
+const waterBodies = {{ water_bodies_with_data|safe }};
+
+{% for item in water_bodies_with_data %}
+    {% if item.water_body.location %}
+    const marker{{ forloop.counter }} = L.marker([{{ item.water_body.latitude }}, {{ item.water_body.longitude }}]);
+    
+    let markerColor = '🟢'; // Default green
+    {% if item.has_alerts %}
+        markerColor = '🔴';
+    {% endif %}
+    
+    marker{{ forloop.counter }}.addTo(map)
+        .bindPopup(`
+            <strong>${markerColor} {{ item.water_body.name }}</strong><br>
+            Type: {{ item.water_body.get_water_body_type_display }}<br>
+            {% if item.latest_measurement %}
+                Latest: {{ item.latest_measurement.measured_at|date:"M d, Y" }}<br>
+                Status: {{ item.quality_status|title }}<br>
+                <a href="{% url 'water_body_detail' item.water_body.pk %}">View Details</a>
+            {% else %}
+                No measurements yet
+            {% endif %}
+        `);
+    {% endif %}
+{% endfor %}
+
+// Chart data from backend
+const chartData = {{ chart_data|safe }};
+
+// pH Chart
+const phCtx = document.getElementById('phChart');
+if (phCtx && chartData.length > 0) {
+    new Chart(phCtx, {
+        type: 'line',
+        data: {
+            labels: chartData[0].data.map(d => d.date),
+            datasets: chartData.map((wb, idx) => ({
+                label: wb.name,
+                data: wb.data.map(d => d.ph),
+                borderColor: `hsl(${idx * 60}, 70%, 50%)`,
+                tension: 0.1
+            }))
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 5,
+                    max: 10,
+                    title: {
+                        display: true,
+                        text: 'pH Level'
+                    }
+                }
+            },
+            plugins: {
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            yMin: 6.5,
+                            yMax: 6.5,
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                content: 'EPA Min',
+                                enabled: true
+                            }
+                        },
+                        line2: {
+                            type: 'line',
+                            yMin: 8.5,
+                            yMax: 8.5,
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                content: 'EPA Max',
+                                enabled: true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Dissolved Oxygen Chart
+const doCtx = document.getElementById('doChart');
+if (doCtx && chartData.length > 0) {
+    new Chart(doCtx, {
+        type: 'line',
+        data: {
+            labels: chartData[0].data.map(d => d.date),
+            datasets: chartData.map((wb, idx) => ({
+                label: wb.name,
+                data: wb.data.map(d => d.dissolved_oxygen),
+                borderColor: `hsl(${idx * 60}, 70%, 50%)`,
+                tension: 0.1
+            }))
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Dissolved Oxygen (mg/L)'
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
