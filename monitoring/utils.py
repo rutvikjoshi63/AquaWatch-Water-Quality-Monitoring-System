@@ -50,9 +50,9 @@ def export_data_to_excel(queryset):
         alerts_text = '; '.join(alerts) if alerts else 'None'
         
         # Get location coordinates
-        if measurement.location:
-            lat = measurement.location.y
-            lon = measurement.location.x
+        if measurement.sample_latitude and measurement.sample_longitude:
+            lat = measurement.sample_latitude
+            lon = measurement.sample_longitude
         else:
             lat = measurement.water_body.latitude
             lon = measurement.water_body.longitude

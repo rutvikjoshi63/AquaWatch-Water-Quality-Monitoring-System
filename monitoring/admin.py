@@ -2,14 +2,13 @@
 Admin interface for AquaWatch monitoring system.
 """
 from django.contrib import admin
-from django.contrib.gis.admin import GISModelAdmin
 from .models import WaterBody, WaterQualityMeasurement
 
 
 @admin.register(WaterBody)
-class WaterBodyAdmin(GISModelAdmin):
+class WaterBodyAdmin(admin.ModelAdmin):
     """
-    Admin interface for WaterBody model with map display.
+    Admin interface for WaterBody model.
     """
     list_display = ['name', 'water_body_type', 'regulatory_body', 
                    'monitoring_start_date', 'is_active']
@@ -22,20 +21,16 @@ class WaterBodyAdmin(GISModelAdmin):
             'fields': ('name', 'water_body_type', 'description')
         }),
         ('Location', {
-            'fields': ('location',)
+            'fields': ('latitude', 'longitude')
         }),
         ('Regulatory & Monitoring', {
             'fields': ('regulatory_body', 'monitoring_start_date', 'is_active')
         }),
     )
-    
-    default_zoom = 10
-    default_lon = -95.7129
-    default_lat = 37.0902
 
 
 @admin.register(WaterQualityMeasurement)
-class WaterQualityMeasurementAdmin(GISModelAdmin):
+class WaterQualityMeasurementAdmin(admin.ModelAdmin):
     """
     Admin interface for WaterQualityMeasurement model.
     """
@@ -48,7 +43,10 @@ class WaterQualityMeasurementAdmin(GISModelAdmin):
     
     fieldsets = (
         ('Measurement Information', {
-            'fields': ('water_body', 'measured_at', 'measured_by', 'location')
+            'fields': ('water_body', 'measured_at', 'measured_by')
+        }),
+        ('Sample Location', {
+            'fields': ('sample_latitude', 'sample_longitude')
         }),
         ('Water Quality Parameters', {
             'fields': ('ph', 'dissolved_oxygen', 'temperature', 'turbidity',
@@ -72,7 +70,3 @@ class WaterQualityMeasurementAdmin(GISModelAdmin):
     
     display_alerts.short_description = 'EPA Standard Alerts'
     display_alerts.allow_tags = True
-    
-    default_zoom = 10
-    default_lon = -95.7129
-    default_lat = 37.0902

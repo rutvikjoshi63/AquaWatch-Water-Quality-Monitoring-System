@@ -2,7 +2,6 @@
 Forms for AquaWatch water quality monitoring.
 """
 from django import forms
-from django.contrib.gis.geos import Point
 from .models import WaterQualityMeasurement, WaterBody
 
 
@@ -85,9 +84,9 @@ class WaterQualityMeasurementForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.location:
-            self.fields['latitude'].initial = self.instance.location.y
-            self.fields['longitude'].initial = self.instance.location.x
+        if self.instance and self.instance.pk:
+            self.fields['latitude'].initial = self.instance.sample_latitude
+            self.fields['longitude'].initial = self.instance.sample_longitude
     
     def clean(self):
         cleaned_data = super().clean()
@@ -106,11 +105,12 @@ class WaterQualityMeasurementForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Set location from latitude/longitude if provided
+        # Set sample location from latitude/longitude if provided
         latitude = self.cleaned_data.get('latitude')
         longitude = self.cleaned_data.get('longitude')
         if latitude is not None and longitude is not None:
-            instance.location = Point(longitude, latitude)
+            instance.sample_latitude = latitude
+            instance.sample_longitude = longitude
         
         if commit:
             instance.save()

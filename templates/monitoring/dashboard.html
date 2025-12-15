@@ -87,56 +87,36 @@
     </div>
 </div>
 
-<!-- Charts Row -->
-<div class="row mb-4">
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">pH Trends (Last 7 Days)</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="phChart"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Dissolved Oxygen Trends (Last 7 Days)</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="doChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
+console.log('Initializing map...');
+
 // Initialize Map
 const map = L.map('map').setView([37.0902, -95.7129], 4);
+console.log('Map created:', map);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
+console.log('Tile layer added');
 
 // Add markers for water bodies
-const waterBodies = {{ water_bodies_with_data|safe }};
-
+let markerCount = 0;
 {% for item in water_bodies_with_data %}
-    {% if item.water_body.location %}
+    {% if item.water_body.latitude and item.water_body.longitude %}
+    console.log('Creating marker {{ forloop.counter }} for {{ item.water_body.name }}');
     const marker{{ forloop.counter }} = L.marker([{{ item.water_body.latitude }}, {{ item.water_body.longitude }}]);
     
-    let markerColor = '🟢'; // Default green
+    let markerColor{{ forloop.counter }} = '🟢'; // Default green
     {% if item.has_alerts %}
-        markerColor = '🔴';
+        markerColor{{ forloop.counter }} = '🔴';
     {% endif %}
     
     marker{{ forloop.counter }}.addTo(map)
         .bindPopup(`
-            <strong>${markerColor} {{ item.water_body.name }}</strong><br>
+            <strong>${markerColor{{ forloop.counter }}} {{ item.water_body.name }}</strong><br>
             Type: {{ item.water_body.get_water_body_type_display }}<br>
             {% if item.latest_measurement %}
                 Latest: {{ item.latest_measurement.measured_at|date:"M d, Y" }}<br>
@@ -146,100 +126,10 @@ const waterBodies = {{ water_bodies_with_data|safe }};
                 No measurements yet
             {% endif %}
         `);
+    markerCount++;
     {% endif %}
 {% endfor %}
 
-// Chart data from backend
-const chartData = {{ chart_data|safe }};
-
-// pH Chart
-const phCtx = document.getElementById('phChart');
-if (phCtx && chartData.length > 0) {
-    new Chart(phCtx, {
-        type: 'line',
-        data: {
-            labels: chartData[0].data.map(d => d.date),
-            datasets: chartData.map((wb, idx) => ({
-                label: wb.name,
-                data: wb.data.map(d => d.ph),
-                borderColor: `hsl(${idx * 60}, 70%, 50%)`,
-                tension: 0.1
-            }))
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    min: 5,
-                    max: 10,
-                    title: {
-                        display: true,
-                        text: 'pH Level'
-                    }
-                }
-            },
-            plugins: {
-                annotation: {
-                    annotations: {
-                        line1: {
-                            type: 'line',
-                            yMin: 6.5,
-                            yMax: 6.5,
-                            borderColor: 'red',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            label: {
-                                content: 'EPA Min',
-                                enabled: true
-                            }
-                        },
-                        line2: {
-                            type: 'line',
-                            yMin: 8.5,
-                            yMax: 8.5,
-                            borderColor: 'red',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            label: {
-                                content: 'EPA Max',
-                                enabled: true
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-// Dissolved Oxygen Chart
-const doCtx = document.getElementById('doChart');
-if (doCtx && chartData.length > 0) {
-    new Chart(doCtx, {
-        type: 'line',
-        data: {
-            labels: chartData[0].data.map(d => d.date),
-            datasets: chartData.map((wb, idx) => ({
-                label: wb.name,
-                data: wb.data.map(d => d.dissolved_oxygen),
-                borderColor: `hsl(${idx * 60}, 70%, 50%)`,
-                tension: 0.1
-            }))
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Dissolved Oxygen (mg/L)'
-                    }
-                }
-            }
-        }
-    });
-}
+console.log(`Total markers added: ${markerCount}`);
 </script>
 {% endblock %}

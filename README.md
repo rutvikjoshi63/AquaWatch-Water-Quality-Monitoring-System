@@ -13,7 +13,7 @@ AquaWatch is a comprehensive Django web application designed for monitoring and 
 python manage.py migrate
 
 # 2. Load sample data (optional but recommended)
-python manage.py create_sample_data
+python manage.py create_data
 
 # 3. Start the server
 python manage.py runserver 0.0.0.0:8000
@@ -113,7 +113,7 @@ Stores individual water quality readings:
 | Component | Technology |
 |-----------|-----------|
 | **Backend** | Django 5.0.1 |
-| **Database** | SQLite (dev) / PostgreSQL 15 + PostGIS 3.3 (production) |
+| **Database** | SQLite |
 | **Frontend** | Bootstrap 5, Chart.js, Leaflet |
 | **Data Processing** | pandas, numpy, openpyxl |
 | **Testing** | pytest-django |
@@ -152,11 +152,11 @@ Stores individual water quality readings:
 
 5. **Load sample data (recommended):**
    ```bash
-   python manage.py create_sample_data
+   python manage.py create_data
    ```
-   This creates:
+   This loads from Excel file:
    - 5 water bodies (Lake Michigan, Mississippi River, Lake Tahoe, Chesapeake Bay, Colorado River)
-   - 10-25 water quality measurements
+   - 16 water quality measurements with real data
    - Some measurements with EPA alerts
 
 6. **Start the development server:**
@@ -305,7 +305,8 @@ pytest --cov=monitoring --cov-report=html
 ├── monitoring/             # Main application
 │   ├── management/
 │   │   └── commands/
-│   │       └── create_sample_data.py  # Sample data generator
+│   │       ├── create_data.py  # Data loader from Excel
+│   │       └── water_quality_data.xlsx  # Sample data file
 │   ├── migrations/         # Database migrations
 │   ├── tests/             # Test suite
 │   │   ├── test_models.py
@@ -373,7 +374,7 @@ Measurements outside these ranges automatically generate alerts visible in:
 # Reset database
 rm db.sqlite3
 python manage.py migrate
-python manage.py create_sample_data
+python manage.py create_data
 ```
 
 ### Port Already in Use
@@ -421,8 +422,8 @@ python manage.py createsuperuser
 # Django shell
 python manage.py shell
 
-# Load sample data
-python manage.py create_sample_data
+# Load data from Excel
+python manage.py create_data
 
 # Collect static files
 python manage.py collectstatic
@@ -564,5 +565,5 @@ This is a demonstration project created for educational purposes.
 
 ---
 
-**Technology Stack**: Django 5.0 + SQLite/PostgreSQL + Bootstrap + Chart.js + Leaflet  
+**Technology Stack**: Django 5.0 + SQLite + Bootstrap + Chart.js + Leaflet  
 **Purpose**: Environmental water quality monitoring and EPA compliance tracking

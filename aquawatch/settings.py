@@ -63,25 +63,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'aquawatch.wsgi.application'
 
 # Database configuration
-# Using SQLite for development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-# Uncomment below for PostGIS (requires PostgreSQL with PostGIS extension)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         'NAME': os.getenv('DATABASE_NAME', 'aquawatch'),
-#         'USER': os.getenv('DATABASE_USER', 'aquawatch_user'),
-#         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'aquawatch_pass'),
-#         'HOST': os.getenv('DATABASE_HOST', 'db'),
-#         'PORT': os.getenv('DATABASE_PORT', '5432'),
-#     }
-# }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

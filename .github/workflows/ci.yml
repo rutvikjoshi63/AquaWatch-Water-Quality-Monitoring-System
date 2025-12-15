@@ -10,21 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: postgis/postgis:15-3.3
-        env:
-          POSTGRES_DB: aquawatch_test
-          POSTGRES_USER: aquawatch_user
-          POSTGRES_PASSWORD: aquawatch_pass
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    
     steps:
     - uses: actions/checkout@v3
     
@@ -53,11 +38,6 @@ jobs:
     
     - name: Run migrations
       env:
-        DATABASE_NAME: aquawatch_test
-        DATABASE_USER: aquawatch_user
-        DATABASE_PASSWORD: aquawatch_pass
-        DATABASE_HOST: localhost
-        DATABASE_PORT: 5432
         SECRET_KEY: test-secret-key-for-ci
         DEBUG: True
       run: |
@@ -65,11 +45,6 @@ jobs:
     
     - name: Run tests
       env:
-        DATABASE_NAME: aquawatch_test
-        DATABASE_USER: aquawatch_user
-        DATABASE_PASSWORD: aquawatch_pass
-        DATABASE_HOST: localhost
-        DATABASE_PORT: 5432
         SECRET_KEY: test-secret-key-for-ci
         DEBUG: True
       run: |
@@ -87,22 +62,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Log in to Docker Hub (optional)
-      # Uncomment and configure if pushing to Docker Hub
-      # uses: docker/login-action@v2
-      # with:
-      #   username: ${{ secrets.DOCKER_USERNAME }}
-      #   password: ${{ secrets.DOCKER_PASSWORD }}
-      run: echo "Docker login disabled - configure if needed"
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     
     - name: Build Docker image
       run: |
-        docker build -t aquawatch:${{ github.sha }} .
-        docker tag aquawatch:${{ github.sha }} aquawatch:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/aquawatch:${{ github.sha }} .
+        docker tag ${{ secrets.DOCKER_USERNAME }}/aquawatch:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/aquawatch:latest
     
-    - name: Push Docker image (optional)
-      # Uncomment if pushing to registry
-      # run: |
-      #   docker push aquawatch:${{ github.sha }}
-      #   docker push aquawatch:latest
-      run: echo "Docker push disabled - configure if needed"
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/aquawatch:${{ github.sha }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/aquawatch:latest
