@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.gis.geos import Point
 from django.utils import timezone
 from monitoring.models import WaterBody, WaterQualityMeasurement
 
@@ -10,7 +9,8 @@ def water_body():
     return WaterBody.objects.create(
         name="Test Lake",
         water_body_type="LAKE",
-        location=Point(-95.7129, 37.0902),
+        latitude=37.0902,
+        longitude=-95.7129,
         description="A test water body",
         regulatory_body="EPA Region 7",
         monitoring_start_date=timezone.now().date()
@@ -31,5 +31,6 @@ def measurement(water_body):
         phosphates=0.05,
         ecoli_count=50,
         measured_by="Test Researcher",
-        location=Point(-95.7129, 37.0902)
+        sample_latitude=37.0902,
+        sample_longitude=-95.7129
     )
