@@ -25,9 +25,15 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run migrations
+        env:
+          SECRET_KEY: test-secret-key-for-ci
+          DEBUG: True
         run: python manage.py migrate
 
       - name: Run tests
+        env:
+          SECRET_KEY: test-secret-key-for-ci
+          DEBUG: True
         run: python -m pytest -v
 
   build-and-push:
