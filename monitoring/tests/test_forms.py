@@ -2,7 +2,6 @@
 Tests for AquaWatch forms.
 """
 import pytest
-from django.contrib.gis.geos import Point
 from django.utils import timezone
 from monitoring.forms import WaterQualityMeasurementForm
 from monitoring.models import WaterBody
@@ -72,7 +71,7 @@ class TestWaterQualityMeasurementForm:
         assert not form.is_valid()
     
     def test_form_saves_location(self, water_body):
-        """Test form correctly saves location as Point."""
+        """Test form correctly saves location coordinates."""
         data = {
             'water_body': water_body.id,
             'measured_at': timezone.now().strftime('%Y-%m-%dT%H:%M'),
@@ -92,6 +91,7 @@ class TestWaterQualityMeasurementForm:
         assert form.is_valid()
         measurement = form.save()
         
-        assert measurement.location is not None
-        assert abs(measurement.location.y - 40.7128) < 0.0001
-        assert abs(measurement.location.x - (-74.0060)) < 0.0001
+        assert measurement.sample_latitude is not None
+        assert measurement.sample_longitude is not None
+        assert abs(measurement.sample_latitude - 40.7128) < 0.0001
+        assert abs(measurement.sample_longitude - (-74.0060)) < 0.0001

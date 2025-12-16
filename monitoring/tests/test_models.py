@@ -2,7 +2,6 @@
 Tests for AquaWatch models.
 """
 import pytest
-from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from monitoring.models import WaterBody, WaterQualityMeasurement
@@ -17,7 +16,8 @@ class TestWaterBody:
         wb = WaterBody.objects.create(
             name="Blue Lake",
             water_body_type="LAKE",
-            location=Point(-95.7129, 37.0902),
+            latitude=37.0902,
+            longitude=-95.7129,
             description="A beautiful blue lake",
             regulatory_body="EPA Region 7"
         )
