@@ -106,15 +106,19 @@ Stores individual water quality readings:
 - **Relationships**: Linked to specific water body
 - **Auto-calculated**: EPA compliance status, quality rating, alerts
 
+### Entity-Relationship Diagram
+
+![Water Monitoring ERD](Water_monitoring.drawio.png)
+
 ---
 
 ## 🛠️ Technical Stack
 
 | Component | Technology |
 |-----------|-----------|
-| **Backend** | Django 5.0.1 |
+| **Backend** | Django |
 | **Database** | SQLite |
-| **Frontend** | Bootstrap 5, Chart.js, Leaflet |
+| **Frontend** | Bootstrap , Chart.js, Leaflet |
 | **Data Processing** | pandas, numpy, openpyxl |
 | **Testing** | pytest-django |
 | **Web Server** | Django dev server / Gunicorn (production) |
@@ -126,7 +130,7 @@ Stores individual water quality readings:
 
 ### Prerequisites
 - Python 3.11+
-- pip and virtualenv (recommended)
+- pip 
 
 ### Installation Steps
 
@@ -167,16 +171,6 @@ Stores individual water quality readings:
 7. **Access the application:**
    - Main app: http://localhost:8000
    - Admin panel: http://localhost:8000/admin
-
-### Environment Variables
-
-Create a `.env` file for configuration (optional):
-```bash
-SECRET_KEY=your-secret-key-here
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///db.sqlite3
-```
 
 ---
 
@@ -300,7 +294,6 @@ pytest --cov=monitoring --cov-report=html
 │   ├── settings.py        # Configuration
 │   ├── urls.py            # Root URL routing
 │   ├── wsgi.py            # WSGI config
-│   └── asgi.py            # ASGI config
 │
 ├── monitoring/             # Main application
 │   ├── management/
@@ -382,18 +375,6 @@ python manage.py create_data
 # Use a different port
 python manage.py runserver 8001
 ```
-
-### Static Files Not Loading
-```bash
-python manage.py collectstatic --noinput
-```
-
-### Import Errors
-```bash
-# Reinstall dependencies
-pip install -r requirements.txt
-```
-
 ### Test Failures
 ```bash
 # Clear test database and rerun
@@ -415,12 +396,6 @@ python manage.py makemigrations
 
 # Apply migrations
 python manage.py migrate
-
-# Create superuser
-python manage.py createsuperuser
-
-# Django shell
-python manage.py shell
 
 # Load data from Excel
 python manage.py create_data
@@ -450,25 +425,6 @@ python manage.py collectstatic
 2. Create migration
 3. Test in admin interface
 
-### API Development (Future Enhancement)
-
-The application is structured to easily add REST API endpoints using Django REST Framework:
-```bash
-pip install djangorestframework
-```
-
-### Security Best Practices
-
-For production deployment:
-1. Change `SECRET_KEY` to a random string
-2. Set `DEBUG=False` in settings
-3. Update `ALLOWED_HOSTS` with your domain
-4. Use environment variables for sensitive data
-5. Enable HTTPS
-6. Use strong database passwords
-7. Set up regular backups
-8. Configure CORS properly if building API
-
 ---
 
 ## 🎓 Key Features Demonstrated
@@ -490,62 +446,6 @@ This project showcases:
 - Chart.js visualizations
 - Excel report generation with openpyxl
 
-✅ **Software Engineering Best Practices**
-- Test-driven development (TDD)
-- Clean code architecture
-- Comprehensive documentation
-- Version control ready
-
-✅ **Domain Knowledge**
-- Environmental monitoring
-- EPA regulatory compliance
-- Scientific data collection
-- Quality assurance protocols
-
----
-
-## 📈 System Statistics
-
-- **Models**: 2 core models (WaterBody, WaterQualityMeasurement)
-- **Views**: 4 main views (dashboard, submit, detail, export)
-- **Tests**: 25+ comprehensive tests
-- **Templates**: 5 responsive HTML pages
-- **EPA Parameters**: 7 monitored standards
-- **Lines of Code**: ~3,500+
-
----
-
-## 🚀 Future Enhancements
-
-Potential additions to the system:
-
-1. **User Authentication**: Multi-user support with role-based permissions
-2. **Email Alerts**: Automatic notifications for EPA violations
-3. **REST API**: RESTful API for mobile app integration
-4. **Batch Import**: CSV/Excel data import functionality
-5. **Weather Integration**: Correlate with weather data
-6. **Predictive Analytics**: ML models for water quality predictions
-7. **Mobile App**: Native iOS/Android companion app
-8. **Scheduled Reports**: Automated weekly/monthly report generation
-9. **Advanced Mapping**: Heatmaps, clustering, custom overlays
-10. **Historical Trends**: Long-term trend analysis and reporting
-
----
-
-## 📞 Support & Resources
-
-- **Django Documentation**: https://docs.djangoproject.com/
-- **Chart.js**: https://www.chartjs.org/
-- **Leaflet**: https://leafletjs.com/
-- **Bootstrap**: https://getbootstrap.com/
-- **EPA Water Quality Standards**: https://www.epa.gov/
-
----
-
-## 📄 License
-
-This is a demonstration project created for educational purposes.
-
 ---
 
 ## ✨ Summary
@@ -561,9 +461,4 @@ This is a demonstration project created for educational purposes.
 ✅ Is mobile-friendly and responsive  
 ✅ Follows best practices for security and architecture  
 
-**Built with Django, tested with pytest, ready to deploy!**
-
----
-
-**Technology Stack**: Django 5.0 + SQLite + Bootstrap + Chart.js + Leaflet  
-**Purpose**: Environmental water quality monitoring and EPA compliance tracking
+**Built with Django, tested with pytest**
