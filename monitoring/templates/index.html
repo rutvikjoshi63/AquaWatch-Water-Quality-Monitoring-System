@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - AquaWatch</title>
+    <link rel="stylesheet" href="{% static 'monitoring/css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <nav style="background: #0d6efd; align-items: center;">
+        <a href="{% url 'index' %}" style="color: white;">🌊 AquaWatch</a>
+        <div>
+            <a href="{% url 'index' %}" style="color: white;">Dashboard</a>
+            <a href="{% url 'submit_data' %}" style="color: white;">Submit Data</a>
+            <a href="/admin/" style="color: white;">Admin</a>
+        </div>
+    </nav>
+    
+    <main>
+        <h1>Water Quality Monitoring Dashboard</h1>
+        <div>
+            <p><strong>Active Water Bodies:</strong> {{ total_water_bodies }}</p>
+            <p><strong>Total Measurements:</strong> {{ total_measurements }}</p>
+        </div>
+
+        <div>
+            <h5>Monitoring Locations</h5>
+            <div id="map" style="height: 500px; border: 1px solid #ddd;"></div>
+        </div>
+        <a href="{% url 'export_data' %}" style="display: inline-block; background: #28a745; color: white;">
+                Export Data to Excel
+            </a>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{% static 'monitoring/js/dashboard.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const waterBodiesData = [
+                {% for item in water_bodies_with_data %}
+                {% if item.water_body.latitude and item.water_body.longitude %}
+                {
+                    latitude: {{ item.water_body.latitude }},
+                    longitude: {{ item.water_body.longitude }},
+                    name: "{{ item.water_body.name|escapejs }}"
+                },
+                {% endif %}
+                {% endfor %}
+            ];
+            
+            initMap(waterBodiesData);
+        });
+    </script>
+</body>
+</html>

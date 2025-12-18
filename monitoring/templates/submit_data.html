@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Data - AquaWatch</title>
+    <link rel="stylesheet" href="{% static 'monitoring/css/style.css' %}">
+</head>
+<body>
+    <nav style="background: #0d6efd;">
+        <a href="{% url 'index' %}">🌊 AquaWatch</a>
+        <div>
+            <a href="{% url 'index' %}">Dashboard</a>
+            <a href="{% url 'submit_data' %}">Submit Data</a>
+        </div>
+    </nav>
+    
+    <main>
+        <h1>Submit Water Quality Data</h1>
+        <p><strong>Note:</strong> All fields are required.</p>
+        
+        <form method="post">
+            <div>
+                <label for="water_body">Water Body:</label>
+                <input type="text" id="water_body" name="water_body" required>
+            </div>
+            <div>
+                <label for="water_body_type">Water Body Type:</label>
+                <select id="water_body_type" name="water_body_type" required>
+                    <option value="">Select Type</option>
+                    <option value="LAKE">Lake</option>
+                    <option value="RIVER">River</option>
+                    <option value="OCEAN">Ocean</option>
+                    <option value="POND">Pond</option>
+                    <option value="STREAM">Stream</option>
+                    <option value="BAY">Bay</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="latitude">Latitude:</label>
+                <input type="number" id="latitude" name="latitude" step="any" required>
+            </div>
+            
+            <div>
+                <label for="longitude">Longitude:</label>
+                <input type="number" id="longitude" name="longitude" step="any" required>
+            </div>
+            
+            <div>
+                <label for="measured_at">Measurement Date:</label>
+                <input type="date" id="measured_at" name="measured_at" required>
+            </div>
+            
+            <div>
+                <label for="ph">pH:</label>
+                <input type="number" id="ph" name="ph" step="0.1" required>
+            </div>
+            
+            <div>
+                <label for="dissolved_oxygen">Dissolved Oxygen (mg/L):</label>
+                <input type="number" id="dissolved_oxygen" name="dissolved_oxygen" step="0.1" required>
+            </div>
+            
+            <div>
+                <label for="temperature">Temperature (°C):</label>
+                <input type="number" id="temperature" name="temperature" step="0.1" required>
+            </div>
+            
+            <div>
+                <label for="notes">Notes:</label>
+                <textarea id="notes" name="notes" rows="4" required></textarea>
+            </div>
+            
+            <div>
+                <button type="submit">Submit Data</button>
+                <a href="{% url 'index' %}">Cancel</a>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

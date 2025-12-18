@@ -1,5 +1,5 @@
 {
-    "name": "Project",
+    "name": "Aquawatch",
     "build": {
         "dockerfile": "../Dockerfile",
         "context": ".."
@@ -9,7 +9,7 @@
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
-                "ms-python.autopep8"
+                "ms-python.black-formatter"
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/usr/local/bin/python",
@@ -22,9 +22,6 @@
             }
         }
     },
-    "postCreateCommand": "pip install -r requirements.txt",
-    "remoteUser": "root",
-    "mounts": [
-        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
-    ]
+    "postCreateCommand": "pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
+    "remoteUser": "root"
 }

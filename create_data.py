@@ -15,10 +15,6 @@ class Command(BaseCommand):
         for row in ws_wb.iter_rows(min_row=2, values_only=True):
             name, wb_type, lat, lon, description, regulatory_body = row
             
-            # Skip rows with empty name
-            if not name:
-                continue
-            
             WaterBody.objects.get_or_create(
                 name=name,
                 defaults={
@@ -32,10 +28,8 @@ class Command(BaseCommand):
         ws_meas = wb['Measurements']
         
         for row in ws_meas.iter_rows(min_row=2, values_only=True):
-            water_body_name, date_str, ph, dissolved_oxygen, temperature, notes = row[:6]
-            
-            if not water_body_name:
-                continue
+            (water_body_name, date_str, ph, dissolved_oxygen, temperature,
+            sample_lat, sample_lon, notes) = row
             
             try:
                 water_body = WaterBody.objects.get(name=water_body_name)
