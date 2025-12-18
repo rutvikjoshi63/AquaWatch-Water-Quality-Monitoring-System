@@ -30,7 +30,7 @@ jobs:
         env:
           SECRET_KEY: test-secret-key-for-ci
           DEBUG: True
-        run: python -m pytest -v
+        run: DJANGO_SETTINGS_MODULE=aquawatch.settings pytest
 
   release:
     runs-on: ubuntu-latest
