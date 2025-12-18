@@ -1,6 +1,8 @@
 
 # Water Quality Logging System
 
+![Water Logging System](WaterLogging.png)
+
 Django web application for logging and viewing water quality measurements for various water bodies. 
 ---
 
