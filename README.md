@@ -4,19 +4,6 @@
 Django web application for logging and viewing water quality measurements for various water bodies. 
 ---
 
-## Quick Start
-
-```bash
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
-```
-
-Visit:
-- Dashboard: http://localhost:8000
-- Admin: http://localhost:8000/admin
-
----
-
 ## Features
 
 - Log water quality measurements
@@ -57,6 +44,12 @@ Visit:
    ```bash
    python manage.py runserver 0.0.0.0:8000
    ```
+
+---
+
+Visit:
+- Dashboard: http://localhost:8000
+- Admin: http://localhost:8000/admin
 
 ---
 
